@@ -1,0 +1,10 @@
+{
+  "name": "The W.B. Mates Traitors",
+  "short_name": "W.B. Traitors",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1B1410",
+  "theme_color": "#1B1410",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

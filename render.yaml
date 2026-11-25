@@ -1,0 +1,9 @@
+# One-click deploy on Render (https://render.com): New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: wb-mates-traitors
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
