@@ -50,6 +50,9 @@ A comic-strip guide to the game (nine illustrated scenes) is built in:
 - Inside a game: the **?** button in the header (closing it returns you to exactly where you were)
 - As its own page at `/how-to-play`, handy for a second screen or for sending to friends before the party. The TV lobby shows the address.
 
+The guide has a **Full game / Simple mode** switch. Simple Mode has its own scenes for the card and the night, since only the Mafia act at night there.
+Inside a Simple Mode game the guide opens on the Simple Mode tab by itself, and `/how-to-play?mode=simple` links straight to it.
+
 The scenes live in `src/client/Guide.tsx` (inline SVG, so they stay sharp and need no image files).
 
 ## Party night

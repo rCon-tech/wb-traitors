@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Logo } from './ui';
 
 // A comic-strip guide to the game: nine scenes, one per step. All art is inline SVG in the pub palette.
@@ -99,6 +99,57 @@ const art = {
           <T x={(x as number) + 26} y={(y as number) + 40} size={8}>{name as string}</T>
         </g>
       ))}
+    </Scene>
+  ),
+
+  cardsSimple: (
+    <Scene label="A phone with a role card, beside the only two roles in Simple Mode">
+      <Phone x={20} y={13}>
+        <rect x={30} y={30} width="54" height="72" rx="6" fill={C.emerald} stroke={C.brass} strokeWidth="2" />
+        <T x={57} y={62} size={8.5} display>VILLAGER</T>
+        <T x={57} y={78} size={6} fill={C.cream}>hold to peek</T>
+        <circle cx={57} cy={96} r="13" fill={C.cream} opacity="0.55" />
+      </Phone>
+      {[
+        ['Villager', 'most of you', C.emerald2, 118],
+        ['Mafia', 'a few Traitors', C.whiskey2, 176],
+      ].map(([name, what, col, x]) => (
+        <g key={name as string}>
+          <rect x={x as number} y={30} width="54" height="62" rx="6" fill={C.stout} stroke={col as string} strokeWidth="2" />
+          <circle cx={(x as number) + 27} cy={52} r="11" fill={col as string} />
+          <T x={(x as number) + 27} y={77} size={9} weight={600}>{name as string}</T>
+          <T x={(x as number) + 27} y={88} size={6.5} fill={C.brass}>{what as string}</T>
+        </g>
+      ))}
+      <T x={172} y={116} size={8.5} fill={C.brass}>No Detective. No Doctor.</T>
+    </Scene>
+  ),
+
+  nightSimple: (
+    <Scene label="At night only the Mafia act while everyone else carries on partying" bg={C.night}>
+      {[[24, 18], [64, 34], [104, 12], [150, 24], [30, 54]].map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r={i % 2 ? 1.2 : 1.8} fill={C.cream} opacity="0.8" />
+      ))}
+      <circle cx={196} cy={30} r="18" fill={C.cream} />
+      <circle cx={203} cy={25} r="16" fill={C.night} />
+      <T x={78} y={30} size={11} fill={C.brass} display>Last orders...</T>
+      <rect x={10} y={60} width="104" height="82" rx="8" fill={C.stout2} stroke={C.whiskey2} strokeWidth="2" />
+      <rect x={122} y={60} width="108" height="82" rx="8" fill={C.stout2} stroke={C.emerald2} strokeWidth="2" />
+      <Person x={40} y={78} color={C.whiskey} s={0.62} />
+      <Person x={84} y={78} color={C.whiskey} s={0.62} />
+      <T x={62} y={118} size={8.5} weight={600}>Mafia pick a victim</T>
+      <T x={62} y={131} size={7.5} fill={C.brass}>ends when they decide</T>
+      <Person x={146} y={78} color={C.emerald} s={0.62} />
+      <Person x={176} y={78} color={C.blue} s={0.62} />
+      <Person x={206} y={78} color={C.mah2} s={0.62} />
+      {[146, 176, 206].map((x) => (
+        <g key={x} transform={`translate(${x - 4.5} 90) scale(0.45)`}>
+          <path d="M0 0h20l-3 22a3 3 0 0 1-3 3h-8a3 3 0 0 1-3-3z" fill={C.stout} stroke={C.cream} strokeWidth="2" />
+          <path d="M0 0h20l-.8 6H.8z" fill={C.cream} />
+        </g>
+      ))}
+      <T x={176} y={118} size={8.5} weight={600}>Everyone else</T>
+      <T x={176} y={131} size={7.5} fill={C.brass}>carry on partying</T>
     </Scene>
   ),
 
@@ -289,10 +340,43 @@ const PANELS: { title: string; text: string; art: ReactNode }[] = [
   },
 ];
 
-export function Storyboard() {
+type Mode = 'full' | 'simple';
+const at = (i: number) => PANELS[i] as (typeof PANELS)[number];
+
+/** Simple Mode: same story, but only Mafia and Villagers, and only the Mafia act at night. */
+const PANELS_SIMPLE: typeof PANELS = [
+  at(0),
+  {
+    title: 'Get your card',
+    text: 'Press and hold the card to peek at your secret role, then let go. Simple Mode has only two roles: most of you are Villagers, and a few are Traitors (Mafia). No Detective, no Doctor.',
+    art: art.cardsSimple,
+  },
+  {
+    title: 'Night falls',
+    text: 'Only the Mafia have to do anything: they pick a victim together and tap Lock in. The night ends once they have decided. Everyone else can keep chatting and eating. Villagers get an optional tap so every phone looks the same.',
+    art: art.nightSimple,
+  },
+  {
+    title: 'Dawn',
+    text: 'The pub tells the story of who was lost in the night. Nobody finds out who did it. Nobody can be saved in Simple Mode.',
+    art: art.dawn,
+  },
+  at(4),
+  at(5),
+  at(6),
+  {
+    title: 'Who wins?',
+    text: 'The village wins when every Mafia member is voted out. The Mafia win when they equal everyone else. Otherwise it is night again.',
+    art: art.win,
+  },
+  at(8),
+];
+
+export function Storyboard({ mode = 'full' }: { mode?: Mode }) {
+  const panels = mode === 'simple' ? PANELS_SIMPLE : PANELS;
   return (
     <ol className="storyboard">
-      {PANELS.map((p, i) => (
+      {panels.map((p, i) => (
         <li className="panel" key={p.title}>
           <span className="panel-num" aria-hidden="true">{i + 1}</span>
           <div className="panel-art">{p.art}</div>
@@ -304,13 +388,17 @@ export function Storyboard() {
   );
 }
 
-function Tips() {
+function Tips({ mode }: { mode: Mode }) {
   return (
     <div className="card tips">
       <h2>Good to know</h2>
       <ul>
         <li>Keep your screen to yourself, especially at night. Turn the brightness down and hold the phone close.</li>
-        <li>Everyone taps something at night, whatever their role, so nobody can tell who is who by watching.</li>
+        {mode === 'simple' ? (
+          <li>Simple Mode keeps the party going: at night only the Mafia need their phones, so nobody else is held up.</li>
+        ) : (
+          <li>Everyone taps something at night, whatever their role, so nobody can tell who is who by watching.</li>
+        )}
         <li>Need a break or a top-up? The host can pause the game from the host controls.</li>
         <li>If your phone locks or the page refreshes, just reopen the site and you are back in your seat.</li>
       </ul>
@@ -318,24 +406,45 @@ function Tips() {
   );
 }
 
-/** Standalone page at /how-to-play: good for a second screen or sharing a link before the party. */
+function ModeTabs({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void }) {
+  return (
+    <div className="tabs guide-tabs" role="tablist" aria-label="Game mode">
+      <button role="tab" aria-selected={mode === 'full'} className={mode === 'full' ? 'active' : ''} onClick={() => onChange('full')}>Full game</button>
+      <button role="tab" aria-selected={mode === 'simple'} className={mode === 'simple' ? 'active' : ''} onClick={() => onChange('simple')}>Simple mode</button>
+    </div>
+  );
+}
+
+const blurb = (mode: Mode) =>
+  mode === 'simple'
+    ? 'Just Mafia and Villagers: a plain kill and vote. Only the Mafia act at night, so everyone else can keep partying.'
+    : 'Nine scenes, one minute. Nobody sits out: the pub runs the game.';
+
+/** Standalone page at /how-to-play (or /how-to-play?mode=simple): good for a second screen or sharing a link. */
 export function GuidePage() {
+  const [mode, setMode] = useState<Mode>(new URLSearchParams(location.search).get('mode') === 'simple' ? 'simple' : 'full');
+  const change = (m: Mode) => {
+    setMode(m);
+    history.replaceState(null, '', m === 'simple' ? '?mode=simple' : location.pathname);
+  };
   return (
     <div className="guide-page">
       <div className="guide-head">
         <Logo />
         <h1>How to play</h1>
-        <p className="tagline">Nine scenes, one minute. Nobody sits out: the pub runs the game.</p>
+        <ModeTabs mode={mode} onChange={change} />
+        <p className="tagline">{blurb(mode)}</p>
         <a className="btn primary" href="/">Join a game</a>
       </div>
-      <Storyboard />
-      <Tips />
+      <Storyboard mode={mode} />
+      <Tips mode={mode} />
     </div>
   );
 }
 
 /** Full-screen overlay opened from inside the app. Closing it returns to exactly where you were. */
-export function GuideSheet({ onClose }: { onClose: () => void }) {
+export function GuideSheet({ onClose, initialMode = 'full' }: { onClose: () => void; initialMode?: Mode }) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   return (
     <div className="sheet" role="dialog" aria-modal="true" aria-label="How to play">
       <div className="sheet-bar">
@@ -343,8 +452,10 @@ export function GuideSheet({ onClose }: { onClose: () => void }) {
         <button className="btn small" onClick={onClose}>Close</button>
       </div>
       <div className="guide-page">
-        <Storyboard />
-        <Tips />
+        <ModeTabs mode={mode} onChange={setMode} />
+        <p className="tagline center-text">{blurb(mode)}</p>
+        <Storyboard mode={mode} />
+        <Tips mode={mode} />
         <button className="btn primary big" onClick={onClose}>Back to the game</button>
       </div>
     </div>

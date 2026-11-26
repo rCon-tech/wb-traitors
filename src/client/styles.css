@@ -251,3 +251,6 @@ input[type='checkbox'] { width: 26px; height: 26px; accent-color: var(--emerald-
 .panel h3 { color: var(--brass); font-size: 1.15rem; margin: 6px 6px 0; }
 .panel p { margin: 0 6px; font-size: 0.95rem; color: var(--cream); }
 .tips ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+
+.guide-tabs { width: 100%; max-width: 420px; }
+.sheet .guide-tabs { align-self: center; }

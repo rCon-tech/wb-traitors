@@ -104,7 +104,7 @@ function Player() {
           <PausedOverlay view={view} />
         </>
       )}
-      {guide && <GuideSheet onClose={() => setGuide(false)} />}
+      {guide && <GuideSheet onClose={() => setGuide(false)} initialMode={view?.settings.simpleMode ? 'simple' : 'full'} />}
       {toast && <div className="toast" role="status">{toast}</div>}
     </div>
   );
