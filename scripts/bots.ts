@@ -5,7 +5,7 @@
 
 import { pathToFileURL } from 'node:url';
 import { io, type Socket } from 'socket.io-client';
-import type { Ack, View } from '../src/shared/types';
+import type { Ack, HistoryEntry, View } from '../src/shared/types';
 
 export interface BotResult {
   winner?: string;
@@ -13,6 +13,8 @@ export interface BotResult {
   views: number;
   /** Everyone's role as revealed at game over. */
   finalRoles: string[];
+  /** Full night/vote history as shown at game over. */
+  history: HistoryEntry[];
   privacyViolations: string[];
   code: string;
 }
@@ -41,7 +43,14 @@ export class Bot {
 
   private settingsSent = false;
 
-  constructor(public name: string, url: string, private hostCount?: number, private hostSettings?: Record<string, unknown>) {
+  constructor(
+    public name: string,
+    url: string,
+    private hostCount?: number,
+    private hostSettings?: Record<string, unknown>,
+    /** Villagers who never touch their phone at night (the Simple Mode promise). */
+    private idleVillagers = false,
+  ) {
     this.socket = io(url, { transports: ['websocket'], forceNew: true });
     this.socket.on('state:view', (v: View) => {
       this.view = v;
@@ -97,7 +106,7 @@ export class Bot {
         await emit(this.socket, 'host:start', {});
       } else if (v.phase === 'roleReveal' && !me.ready) {
         await emit(this.socket, 'role:ready', {});
-      } else if (v.phase === 'night' && me.alive && v.night && !v.night.locked) {
+      } else if (v.phase === 'night' && me.alive && v.night && !v.night.locked && !(this.idleVillagers && me.role === 'villager')) {
         const t = pickRandom(v.night.options);
         if (t) await emit(this.socket, 'night:action', { targetId: t });
       } else if (v.phase === 'vote' && me.alive && v.vote && v.vote.myVote === undefined) {
@@ -121,8 +130,12 @@ export async function playFullGame(
   count: number,
   timeoutMs = 90_000,
   settings?: Record<string, unknown>,
+  opts: { idleVillagers?: boolean } = {},
 ): Promise<BotResult> {
-  const bots = Array.from({ length: count }, (_, i) => new Bot(`Bot${i + 1}`, url, i === 0 ? count : undefined, settings));
+  const bots = Array.from(
+    { length: count },
+    (_, i) => new Bot(`Bot${i + 1}`, url, i === 0 ? count : undefined, settings, opts.idleVillagers),
+  );
   const code = await (bots[0] as Bot).create();
   for (const b of bots.slice(1)) await b.join(code);
   const started = Date.now();
@@ -143,6 +156,7 @@ export async function playFullGame(
       rounds: maxRound,
       views: bots.reduce((n, b) => n + b.viewCount, 0),
       finalRoles: ((bots[0] as Bot).view?.players ?? []).map((p) => p.role ?? 'unknown'),
+      history: (bots[0] as Bot).view?.history ?? [],
       privacyViolations: bots.flatMap((b) => b.violations),
       code,
     };
