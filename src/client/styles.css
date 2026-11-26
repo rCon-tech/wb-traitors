@@ -234,3 +234,20 @@ input[type='checkbox'] { width: 26px; height: 26px; accent-color: var(--emerald-
 @media (max-width: 800px) { .tv-clock { font-size: 3.4vw; } .tv-warning { font-size: 5vw; } }
 
 .center-text { text-align: center; margin: 8px 0 0; }
+
+/* How to play: storyboard */
+.help { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--brass); background: transparent; color: var(--brass); font-family: var(--display); font-size: 1.1rem; cursor: pointer; margin-right: 10px; }
+.topbar-right { display: flex; align-items: center; }
+.sheet { position: fixed; inset: 0; z-index: 60; overflow-y: auto; background: var(--stout); padding-bottom: 40px; }
+.sheet-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #120d0af2; border-bottom: 2px solid var(--brass-dim); }
+.sheet-bar h2 { margin: 0; }
+.guide-page { max-width: 1000px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 18px; }
+.guide-head { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding-top: 24px; }
+.storyboard { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); counter-reset: none; }
+.panel { position: relative; background: var(--mahogany); border: 3px solid var(--cream); border-radius: 6px; padding: 8px 8px 14px; box-shadow: 5px 5px 0 #000a; display: flex; flex-direction: column; gap: 6px; }
+.panel-art { border: 2px solid var(--stout); border-radius: 3px; overflow: hidden; line-height: 0; }
+.panel-art svg { width: 100%; height: auto; display: block; }
+.panel-num { position: absolute; top: -12px; left: -12px; width: 34px; height: 34px; border-radius: 50%; background: var(--brass); color: var(--stout); border: 2px solid var(--stout); font-family: var(--display); display: flex; align-items: center; justify-content: center; z-index: 1; font-size: 1.1rem; }
+.panel h3 { color: var(--brass); font-size: 1.15rem; margin: 6px 6px 0; }
+.panel p { margin: 0 6px; font-size: 0.95rem; color: var(--cream); }
+.tips ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }

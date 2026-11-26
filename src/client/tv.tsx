@@ -62,6 +62,7 @@ export function Tv({ code }: { code: string }) {
             <h2>On the stools ({view.players.length})</h2>
             <ul className="tv-names">{view.players.map((p) => <li key={p.id} className={p.connected ? '' : 'away'}>{p.name}</li>)}</ul>
             <p className="tv-sub">{view.players.length < view.minPlayers ? `Need ${view.minPlayers - view.players.length} more to start` : 'Waiting for the host to start'}</p>
+            <p className="tv-sub">New to it? {location.host}/how-to-play</p>
           </div>
         </div>
       );

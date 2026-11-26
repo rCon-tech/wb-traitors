@@ -42,6 +42,16 @@ The server needs WebSockets and one always-on instance. Any of these work:
 
 Then give everyone the address, or put up the QR code from the lobby. Optional: a custom domain such as `traitors.yourdomain.ie`.
 
+## How to play guide
+
+A comic-strip guide to the game (nine illustrated scenes) is built in:
+
+- On the welcome screen: **New to it? How to play**
+- Inside a game: the **?** button in the header (closing it returns you to exactly where you were)
+- As its own page at `/how-to-play`, handy for a second screen or for sending to friends before the party. The TV lobby shows the address.
+
+The scenes live in `src/client/Guide.tsx` (inline SVG, so they stay sharp and need no image files).
+
 ## Party night
 
 1. Open the site on your phone, tap **Open a new pub**. You are the host *and* a player.

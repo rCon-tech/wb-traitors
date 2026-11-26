@@ -8,7 +8,7 @@ import { Card, Countdown, fmtMinutes, gameClock, joinUrl, Logo, nameOf, PlayerLi
 // Welcome
 // ---------------------------------------------------------------------------
 
-export function Welcome() {
+export function Welcome({ onGuide }: { onGuide: () => void }) {
   const params = new URLSearchParams(location.search);
   const [code, setCode] = useState((params.get('room') ?? '').toUpperCase().slice(0, 4));
   const [name, setName] = useState(rememberedName());
@@ -65,6 +65,7 @@ export function Welcome() {
           {busy ? 'One moment...' : mode === 'join' ? 'Pull up a stool' : 'Open the pub'}
         </button>
       </form>
+      <button className="btn ghost" type="button" onClick={onGuide}>New to it? How to play</button>
     </div>
   );
 }
